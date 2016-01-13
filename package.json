@@ -28,5 +28,13 @@
     "babel-register": "^6.3.13",
     "mocha": "^2.3.4",
     "react": "^0.14.6"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uniphil/react-results-proptypes.git"
+  },
+  "bugs": {
+    "url": "https://github.com/uniphil/react-results-proptypes/issues"
+  },
+  "homepage": "https://github.com/uniphil/react-results-proptypes#readme"
 }
