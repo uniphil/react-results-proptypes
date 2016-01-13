@@ -1,5 +1,7 @@
 # Results PropTypes for React
 
+[![Build Status](https://travis-ci.org/uniphil/react-results-proptypes.svg)](https://travis-ci.org/uniphil/react-results-proptypes)
+
 ```bash
 $ npm install react-results-proptypes
 ```
