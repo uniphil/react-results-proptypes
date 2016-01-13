@@ -1,40 +1,91 @@
 import assert from 'assert';
 import { PropTypes } from 'react';
-import { Union } from 'results';
+import { Union, Maybe, Result } from 'results';
 import ResultsPropTypes from './index';
 
 
+const check = (checker, value, shouldPass) => {
+  const result = checker({ a: value }, 'a', 'testComponent', 'prop');
+  if (shouldPass) {
+    assert.ifError(result instanceof Error, `expected no error, but found a '${typeof result}', (${JSON.stringify(result)})`);
+  } else {
+    assert.ok(result instanceof Error, `expected to fail, but found a '${typeof result}' instead of an Error (${JSON.stringify(result)})`);
+  }
+};
+
+
 describe('Custom union', () => {
-  const U = Union({
-    A: null,
-    B: null
-  });
+  const U = Union({ A: null });
   const aEmpty = U.A();
   const aOk = U.A(true);
-  const tooMuchB = U.B(1, 'blah');
+  const tooMuchA = U.A(1, 'blah');
 
-  const checkU = (checkers, option, shouldFail) => {
-    const validator = ResultsPropTypes.UnionOf(U, checkers);
-    const result = validator({ a: option }, 'a', 'testComponent', 'prop');
-    if (shouldFail) {
-      assert.ok(result instanceof Error);
-    } else {
-      assert.ifError(result instanceof Error);
-    }
-  };
+  const checkU = (checkers, option, shouldPass) =>
+    check(ResultsPropTypes.UnionOf(U, checkers), option, shouldPass);
+
+  describe('wrong type', () => {
+    it('should fail', () =>
+      checkU({ A: [] }, 'not a U', false));
+  });
+
+  describe('bad check spec', () => {
+    it('should fail', () =>
+      checkU({ B: [] }, aEmpty, false));
+  });
 
   describe('empty option', () => {
-    it('should pass with no payload', () => {
-      checkU({ A: [], B: [] }, aEmpty, false);
-    });
+    const uEmpty = { A: [] };
+    it('should pass with no payload', () =>
+      checkU(uEmpty, aEmpty, true));
     it('should fail with a payload', () =>
-      checkU({ A: [], B: [] }, aOk, true));
+      checkU(uEmpty, aOk, false));
   });
-  // it('should check unions with no payload', () => {
-  //   const result = ResultsPropTypes.UnionOf(U, {
-  //     A: [],
-  //     B: []
-  //   })({a: aEmpty}, 'a', 'testComponent', 'prop');
-  //   assert.ifError(result instanceof Error);
-  // });
+
+  describe('one bool option', () => {
+    const uBool = { A: [PropTypes.bool] };
+    it('should fail with no payload', () =>
+      checkU(uBool, aEmpty, false));
+    it('should pass with a bool payload', () =>
+      checkU(uBool, aOk, true));
+    it('should fail with two payloads', () =>
+      checkU(uBool, tooMuchA, false));
+  });
+
+  describe('two payloads', () => {
+    const u2 = { A: [PropTypes.number, PropTypes.string] };
+    it('should pass with two payloads', () =>
+      checkU(u2, tooMuchA, true));
+  });
+});
+
+
+describe('MaybeOf', () => {
+  const { MaybeOf } = ResultsPropTypes;
+
+  it('should pass a None', () =>
+    check(MaybeOf(PropTypes.string), Maybe.None(), true))
+
+  it('should check a Some', () => {
+    check(MaybeOf(PropTypes.string.isRequired), Maybe.Some(), false);
+    check(MaybeOf(PropTypes.string), Maybe.Some(123), false);
+    check(MaybeOf(PropTypes.string), Maybe.Some('a string'), true);
+  });
+});
+
+
+describe('ResultOf', () => {
+  const { ResultOf } = ResultsPropTypes;
+
+  it('should check Ok and Err checkers', () => {
+    const checker = ResultOf({
+      Ok: PropTypes.string.isRequired,
+      Err: PropTypes.instanceOf(Error).isRequired
+    });
+    check(checker, Result.Ok(), false);
+    check(checker, Result.Ok(123), false);
+    check(checker, Result.Ok('abc'), true);
+    check(checker, Result.Err(), false);
+    check(checker, Result.Err(123), false);
+    check(checker, Result.Err(new Error('abc')), true);
+  });
 });

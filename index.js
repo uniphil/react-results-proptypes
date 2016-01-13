@@ -4,7 +4,7 @@ import { Union, UnionError, Maybe, Result } from 'results';
 const mapValues = (obj, fn) =>
   Object.keys(obj)
     .map(k => ({ [k]: fn(obj[k], k) }))
-    .reduce((a, b) => Object.assign({}, a, b));
+    .reduce((a, b) => Object.assign({}, a, b), {});
 
 
 const thunkify = v =>
@@ -54,11 +54,11 @@ const UnionOf = (U, bareCheckers) => {
 
 const ResultsPropTypes = {
   UnionOf,
-  Maybe: someChecker => UnionOf(Maybe, {
+  MaybeOf: someChecker => UnionOf(Maybe, {
     Some: [someChecker],
     None: []
   }),
-  Result: resultCheckers => UnionOf(Result, {
+  ResultOf: resultCheckers => UnionOf(Result, {
     Ok: [resultCheckers.Ok],
     Err: [resultCheckers.Err]
   })
