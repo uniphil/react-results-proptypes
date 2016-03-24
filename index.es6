@@ -1,4 +1,6 @@
-import { Union, UnionError, Maybe, Result } from 'results';
+import { Union, Maybe, Result } from 'results';
+
+const ANONYMOUS = '<<anonymous>>';
 
 
 const mapValues = (obj, fn) =>
@@ -11,56 +13,62 @@ const thunkify = v =>
   () => v;
 
 
-const catchOrElse = (ErrType, tryFn, fn) => {
-  let result;
-  try {
-    result = tryFn();
-  } catch (err) {
-    if (err instanceof ErrType) {
-      return err;
+function createChainableTypeChecker(validate) {
+  function checkType(isRequired, props, propName, componentName, location) {
+    componentName = componentName || ANONYMOUS;
+    if (props[propName] == null) {
+      const locationName = location;
+      if (isRequired) {
+        return new Error(
+          `Required ${locationName} \`${propName}\` was not specified in ` +
+          `\`${componentName}\`.`
+        );
+      }
     } else {
-      throw err;
+      return validate(props, propName, componentName, location);
     }
   }
-  return fn(result);
-};
 
+  var chainedCheckType = checkType.bind(null, false);
+  chainedCheckType.isRequired = checkType.bind(null, true);
 
-const checkAll = (checkers, option, propName, componentName, location) => {
-  if (option.data.length !== checkers.length) {
-    return new Error(
-      `Invalid ${location} '${propName}' supplied to '${componentName}', ` +
-      `expected ${checkers.length} payloads for '${option.name}' but found ` +
-      `${option.data.length}.`
-    );
-  }
-  return checkers.reduce((acc, checker, i) => {
-    if (acc instanceof Error) {
-      return acc;
-    } else {
-      return checker(option.data, i, componentName, location);
-    }
-  }, null);
+  return chainedCheckType;
 }
 
 
-const UnionOf = (U, bareCheckers) => {
-  const checkerMap = mapValues(bareCheckers, thunkify);
-  return (props, propName, componentName, location) =>
-    catchOrElse(UnionError, () => U.match(props[propName], checkerMap), checkers =>
-      checkAll(checkers, props[propName], propName, componentName, location));
+const UnionOf = (U, checks) => {
+  const checkerMatch = mapValues(checks, thunkify);
+  // TODO: verify that all options are covered
+  const validate = (props, propName, componentName, locationName) => {
+    let checker;
+    try {
+      checker = U.match(props[propName], checkerMatch);
+    } catch (err) {
+      return err;
+    }
+    if (checker) {
+      return checker(props[propName], 'payload', componentName || ANONYMOUS, locationName);
+    } else {
+      if (props[propName].payload) {
+        return new Error('bleh');
+      } else {
+        return null;
+      }
+    }
+  };
+  return createChainableTypeChecker(validate);
 };
 
 
 const ResultsPropTypes = {
   UnionOf,
   MaybeOf: someChecker => UnionOf(Maybe, {
-    Some: [someChecker],
-    None: []
+    Some: someChecker,
+    None: null
   }),
   ResultOf: resultCheckers => UnionOf(Result, {
-    Ok: [resultCheckers.Ok],
-    Err: [resultCheckers.Err]
+    Ok: resultCheckers.Ok,
+    Err: resultCheckers.Err
   })
 };
 
