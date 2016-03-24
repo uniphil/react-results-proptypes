@@ -7,7 +7,7 @@ import ResultsPropTypes from './index';
 const check = (checker, value, shouldPass) => {
   const result = checker({ a: value }, 'a', 'testComponent', 'prop');
   if (shouldPass) {
-    assert.ifError(result instanceof Error, `expected no error, but found a '${typeof result}', (${JSON.stringify(result)})`);
+    assert.ifError(result);
   } else {
     assert.ok(result instanceof Error, `expected to fail, but found a '${typeof result}' instead of an Error (${JSON.stringify(result)})`);
   }
@@ -18,23 +18,22 @@ describe('Custom union', () => {
   const U = Union({ A: null });
   const aEmpty = U.A();
   const aOk = U.A(true);
-  const tooMuchA = U.A(1, 'blah');
 
   const checkU = (checkers, option, shouldPass) =>
-    check(ResultsPropTypes.UnionOf(U, checkers), option, shouldPass);
+    check(ResultsPropTypes.unionOf(U, checkers), option, shouldPass);
 
   describe('wrong type', () => {
     it('should fail', () =>
-      checkU({ A: [] }, 'not a U', false));
+      checkU({ A: null }, 'not a U', false));
   });
 
   describe('bad check spec', () => {
     it('should fail', () =>
-      checkU({ B: [] }, aEmpty, false));
+      checkU({ B: null }, aEmpty, false));
   });
 
   describe('empty option', () => {
-    const uEmpty = { A: [] };
+    const uEmpty = { A: null };
     it('should pass with no payload', () =>
       checkU(uEmpty, aEmpty, true));
     it('should fail with a payload', () =>
@@ -42,42 +41,35 @@ describe('Custom union', () => {
   });
 
   describe('one bool option', () => {
-    const uBool = { A: [PropTypes.bool] };
+    const uBool = { A: PropTypes.bool.isRequired };
     it('should fail with no payload', () =>
       checkU(uBool, aEmpty, false));
     it('should pass with a bool payload', () =>
       checkU(uBool, aOk, true));
-    it('should fail with two payloads', () =>
-      checkU(uBool, tooMuchA, false));
   });
 
-  describe('two payloads', () => {
-    const u2 = { A: [PropTypes.number, PropTypes.string] };
-    it('should pass with two payloads', () =>
-      checkU(u2, tooMuchA, true));
-  });
 });
 
 
-describe('MaybeOf', () => {
-  const { MaybeOf } = ResultsPropTypes;
+describe('maybeOf', () => {
+  const { maybeOf } = ResultsPropTypes;
 
   it('should pass a None', () =>
-    check(MaybeOf(PropTypes.string), Maybe.None(), true))
+    check(maybeOf(PropTypes.string), Maybe.None(), true))
 
   it('should check a Some', () => {
-    check(MaybeOf(PropTypes.string.isRequired), Maybe.Some(), false);
-    check(MaybeOf(PropTypes.string), Maybe.Some(123), false);
-    check(MaybeOf(PropTypes.string), Maybe.Some('a string'), true);
+    check(maybeOf(PropTypes.string.isRequired), Maybe.Some(), false);
+    check(maybeOf(PropTypes.string), Maybe.Some(123), false);
+    check(maybeOf(PropTypes.string), Maybe.Some('a string'), true);
   });
 });
 
 
-describe('ResultOf', () => {
-  const { ResultOf } = ResultsPropTypes;
+describe('resultOf', () => {
+  const { resultOf } = ResultsPropTypes;
 
   it('should check Ok and Err checkers', () => {
-    const checker = ResultOf({
+    const checker = resultOf({
       Ok: PropTypes.string.isRequired,
       Err: PropTypes.instanceOf(Error).isRequired
     });

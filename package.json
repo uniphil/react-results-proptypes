@@ -6,6 +6,7 @@
   "scripts": {
     "build": "babel index.es6 > index.js",
     "prepublish": "npm run build",
+    "pretest": "npm run build",
     "test": "mocha --compilers js:babel-register"
   },
   "keywords": [
@@ -22,7 +23,7 @@
   "author": "uniphil",
   "license": "WTFPL",
   "dependencies": {
-    "results": "^0.12.2"
+    "results": "~0.13.0"
   },
   "devDependencies": {
     "babel": "^6.3.26",
