@@ -1,6 +1,6 @@
 {
   "name": "react-results-proptypes",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "proptype validators for results instances",
   "main": "index.js",
   "scripts": {
