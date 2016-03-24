@@ -20,7 +20,7 @@ describe('Custom union', () => {
   const aOk = U.A(true);
 
   const checkU = (checkers, option, shouldPass) =>
-    check(ResultsPropTypes.UnionOf(U, checkers), option, shouldPass);
+    check(ResultsPropTypes.unionOf(U, checkers), option, shouldPass);
 
   describe('wrong type', () => {
     it('should fail', () =>
@@ -51,25 +51,25 @@ describe('Custom union', () => {
 });
 
 
-describe('MaybeOf', () => {
-  const { MaybeOf } = ResultsPropTypes;
+describe('maybeOf', () => {
+  const { maybeOf } = ResultsPropTypes;
 
   it('should pass a None', () =>
-    check(MaybeOf(PropTypes.string), Maybe.None(), true))
+    check(maybeOf(PropTypes.string), Maybe.None(), true))
 
   it('should check a Some', () => {
-    check(MaybeOf(PropTypes.string.isRequired), Maybe.Some(), false);
-    check(MaybeOf(PropTypes.string), Maybe.Some(123), false);
-    check(MaybeOf(PropTypes.string), Maybe.Some('a string'), true);
+    check(maybeOf(PropTypes.string.isRequired), Maybe.Some(), false);
+    check(maybeOf(PropTypes.string), Maybe.Some(123), false);
+    check(maybeOf(PropTypes.string), Maybe.Some('a string'), true);
   });
 });
 
 
-describe('ResultOf', () => {
-  const { ResultOf } = ResultsPropTypes;
+describe('resultOf', () => {
+  const { resultOf } = ResultsPropTypes;
 
   it('should check Ok and Err checkers', () => {
-    const checker = ResultOf({
+    const checker = resultOf({
       Ok: PropTypes.string.isRequired,
       Err: PropTypes.instanceOf(Error).isRequired
     });
