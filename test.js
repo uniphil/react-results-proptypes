@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { PropTypes } from 'react';
 import { Union, Maybe, Result } from 'results';
-import { unionOf, maybeOf, resultOf } from './index';
+import { unionOf, maybeOf, resultOf } from './index.es6';
 
 
 const check = (checker, value, shouldPass) => {
