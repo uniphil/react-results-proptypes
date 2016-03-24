@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { PropTypes } from 'react';
 import { Union, Maybe, Result } from 'results';
-import ResultsPropTypes from './index';
+import { unionOf, maybeOf, resultOf } from './index';
 
 
 const check = (checker, value, shouldPass) => {
@@ -20,7 +20,7 @@ describe('Custom union', () => {
   const aOk = U.A(true);
 
   const checkU = (checkers, option, shouldPass) =>
-    check(ResultsPropTypes.unionOf(U, checkers), option, shouldPass);
+    check(unionOf(U, checkers), option, shouldPass);
 
   describe('wrong type', () => {
     it('should fail', () =>
@@ -52,7 +52,6 @@ describe('Custom union', () => {
 
 
 describe('maybeOf', () => {
-  const { maybeOf } = ResultsPropTypes;
 
   it('should pass a None', () =>
     check(maybeOf(PropTypes.string), Maybe.None(), true))
@@ -66,7 +65,6 @@ describe('maybeOf', () => {
 
 
 describe('resultOf', () => {
-  const { resultOf } = ResultsPropTypes;
 
   it('should check Ok and Err checkers', () => {
     const checker = resultOf({

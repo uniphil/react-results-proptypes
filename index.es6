@@ -36,7 +36,7 @@ function createChainableTypeChecker(validate) {
 }
 
 
-const unionOf = (U, checks) => {
+export const unionOf = (U, checks) => {
   const checkerMatch = mapValues(checks, thunkify);
   // TODO: verify that all options are covered
   const validate = (props, propName, componentName, locationName) => {
@@ -60,16 +60,12 @@ const unionOf = (U, checks) => {
 };
 
 
-const ResultsPropTypes = {
-  unionOf,
-  maybeOf: someChecker => unionOf(Maybe, {
-    Some: someChecker,
-    None: null
-  }),
-  resultOf: resultCheckers => unionOf(Result, {
-    Ok: resultCheckers.Ok,
-    Err: resultCheckers.Err
-  })
-};
+export const maybeOf = someChecker => unionOf(Maybe, {
+  Some: someChecker,
+  None: null
+});
 
-export default ResultsPropTypes;
+export const resultOf = resultCheckers => unionOf(Result, {
+  Ok: resultCheckers.Ok,
+  Err: resultCheckers.Err
+});
