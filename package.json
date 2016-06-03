@@ -1,6 +1,6 @@
 {
   "name": "react-results-proptypes",
-  "version": "0.2.0",
+  "version": "0.4.0",
   "description": "proptype validators for results instances",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   "author": "uniphil",
   "license": "WTFPL",
   "peerDependencies": {
-    "results": "^0.13.0||^0.14.0"
+    "results": "^0.14.0"
   },
   "devDependencies": {
     "babel": "^6.3.26",

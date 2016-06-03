@@ -14,18 +14,25 @@ const thunkify = v =>
 
 
 function createChainableTypeChecker(validate) {
-  function checkType(isRequired, props, propName, componentName, location) {
+  function checkType(
+    isRequired,
+    props,
+    propName,
+    componentName,
+    location,
+    propFullName
+  ) {
     componentName = componentName || ANONYMOUS;
     if (props[propName] == null) {
       const locationName = location;
       if (isRequired) {
         return new Error(
-          `Required ${locationName} \`${propName}\` was not specified in ` +
+          `Required ${locationName} \`${propFullName}\` was not specified in ` +
           `\`${componentName}\`.`
         );
       }
     } else {
-      return validate(props, propName, componentName, location);
+      return validate(props, propName, componentName, location, propFullName);
     }
   }
 
@@ -39,17 +46,22 @@ function createChainableTypeChecker(validate) {
 export const unionOf = (U, checks) => {
   const checkerMatch = mapValues(checks, thunkify);
   // TODO: verify that all options are covered
-  const validate = (props, propName, componentName, locationName) => {
+  const validate = (props, propName, componentName, locationName, propFullName) => {
     let checker;
+    if (!(props[propName] instanceof U.OptionClass)) {
+      return new Error(`Invalid ${locationName} \`${propFullName}\` of type \`${typeof props[propName]}\` supplied to \`${componentName}\`, expected Union{${Object.keys(U.options).join(', ')}}`);
+    }
     try {
       checker = U.match(props[propName], checkerMatch);
     } catch (err) {
-      return err;
+      return new Error(`${locationName} \`${propFullName}\` errored while typechecking: ${err}`);
     }
+    const optionName = props[propName].name;
     if (checker) {
-      return checker(props[propName], 'payload', componentName || ANONYMOUS, locationName);
+      return checker(props[propName], 'payload', componentName || ANONYMOUS, locationName, `${propFullName}<${optionName}>.payload`);
     } else {
       if (props[propName].payload) {
+        return new Error(`Invalid ${locationName} \`${propFullName}<${optionName}>.payload\` of type \`${typeof props[propName]}\` supplied to \`${componentName}\`, expected no payload.`)
         return new Error('bleh');
       } else {
         return null;
