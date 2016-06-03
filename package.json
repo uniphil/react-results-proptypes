@@ -21,8 +21,8 @@
   ],
   "author": "uniphil",
   "license": "WTFPL",
-  "dependencies": {
-    "results": "~0.13.0"
+  "peerDependencies": {
+    "results": "^0.13.0||^0.14.0"
   },
   "devDependencies": {
     "babel": "^6.3.26",
