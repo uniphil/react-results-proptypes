@@ -47,6 +47,7 @@ export const unionOf = (U, checks) => {
   const checkerMatch = mapValues(checks, thunkify);
   // TODO: verify that all options are covered
   const validate = (props, propName, componentName, locationName, propFullName) => {
+    propFullName = propFullName || propName;
     let checker;
     if (!(props[propName] instanceof U.OptionClass)) {
       return new Error(`Invalid ${locationName} \`${propFullName}\` of type \`${typeof props[propName]}\` supplied to \`${componentName}\`, expected Union{${Object.keys(U.options).join(', ')}}`);
@@ -61,8 +62,7 @@ export const unionOf = (U, checks) => {
       return checker(props[propName], 'payload', componentName || ANONYMOUS, locationName, `${propFullName}<${optionName}>.payload`);
     } else {
       if (props[propName].payload) {
-        return new Error(`Invalid ${locationName} \`${propFullName}<${optionName}>.payload\` of type \`${typeof props[propName]}\` supplied to \`${componentName}\`, expected no payload.`)
-        return new Error('bleh');
+        return new Error(`Invalid ${locationName} \`${propFullName}<${optionName}>.payload\` of type \`${typeof props[propName]}\` supplied to \`${componentName}\`, expected no payload.`);
       } else {
         return null;
       }

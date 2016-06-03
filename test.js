@@ -11,12 +11,12 @@ describe('basically works and generates usefull warnings', () => {
       A: PropTypes.string,
       B: PropTypes.number.isRequired,
     }),
-  })({ testProp: x }, 'testProp', 'TestComponent', 'prop', 'testProp');
+  })({ testProp: x }, 'testProp', 'TestComponent', 'prop');
   it('should make ok messages', () => {
     const result = unionOf(U, {
       A: PropTypes.string,
       B: PropTypes.number.isRequired,
-    })({ testProp: U.A(123) }, 'testProp', 'TestComponent', 'prop', 'testProp');
+    })({ testProp: U.A(123) }, 'testProp', 'TestComponent', 'prop');
     assert.equal(String(result), 'Error: Invalid prop `testProp<A>.payload` of type `number` supplied to `TestComponent`, expected `string`.');
   })
   it('should pass something that makes sense', () =>
@@ -35,7 +35,7 @@ describe('basically works and generates usefull warnings', () => {
 
 
 const check = (checker, value, shouldPass, errMsg) => {
-  const result = checker({ testProp: value }, 'testProp', 'testComponent', 'prop', 'testProp');
+  const result = checker({ testProp: value }, 'testProp', 'testComponent', 'prop');
   if (shouldPass) {
     assert.ifError(result);
   } else {
