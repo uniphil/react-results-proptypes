@@ -20,7 +20,8 @@ function createChainableTypeChecker(validate) {
     propName,
     componentName,
     location,
-    propFullName
+    propFullName,
+    ...rest
   ) {
     componentName = componentName || ANONYMOUS;
     if (props[propName] == null) {
@@ -32,7 +33,7 @@ function createChainableTypeChecker(validate) {
         );
       }
     } else {
-      return validate(props, propName, componentName, location, propFullName);
+      return validate(props, propName, componentName, location, propFullName, ...rest);
     }
   }
 
@@ -46,7 +47,7 @@ function createChainableTypeChecker(validate) {
 export const unionOf = (U, checks) => {
   const checkerMatch = mapValues(checks, thunkify);
   // TODO: verify that all options are covered
-  const validate = (props, propName, componentName, locationName, propFullName) => {
+  const validate = (props, propName, componentName, locationName, propFullName, ...rest) => {
     propFullName = propFullName || propName;
     let checker;
     if (!(props[propName] instanceof U.OptionClass)) {
@@ -59,7 +60,7 @@ export const unionOf = (U, checks) => {
     }
     const optionName = props[propName].name;
     if (checker) {
-      return checker(props[propName], 'payload', componentName || ANONYMOUS, locationName, `${propFullName}<${optionName}>.payload`);
+      return checker(props[propName], 'payload', componentName || ANONYMOUS, locationName, `${propFullName}<${optionName}>.payload`, ...rest);
     } else {
       if (props[propName].payload) {
         return new Error(`Invalid ${locationName} \`${propFullName}<${optionName}>.payload\` of type \`${typeof props[propName]}\` supplied to \`${componentName}\`, expected no payload.`);
