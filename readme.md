@@ -1,3 +1,8 @@
+## ⚠️ Project archived ⚠️
+
+I haven't used this in years, and have no idea whether it even works with recent versions of React. You might want to look for something else :)
+
+
 # Results PropTypes for React
 
 [![Build Status](https://travis-ci.org/uniphil/react-results-proptypes.svg)](https://travis-ci.org/uniphil/react-results-proptypes)
